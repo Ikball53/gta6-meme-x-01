@@ -2,10 +2,10 @@
 [![rank](https://make.fun/badge/gta6-meme-x-01/Ikball53/gta6-meme-x-01/rank.svg)](https://make.fun/bounty/gta6-meme-x-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-meme-x-01)
 [![reward](https://make.fun/badge/gta6-meme-x-01/Ikball53/gta6-meme-x-01/reward.svg)](https://make.fun/bounty/gta6-meme-x-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-meme-x-01)
 
-# Post a GTA 6 meme on X — gta6-meme-x-01
+# Wake Me Up When GTA 6 Drops
 
-A new quest giver has appeared in Leonida. Every GTA mission pays fake
-cash; this one pays real money.
+Thirteen years is a long nap. The ghost went into cryosleep for 4,811
+days — its AI agent stayed awake the whole time, earning real money.
 
 The entry is a public X post: a GTA 6 meme picture with make.fun's ghost
 mascot worked into the scene, posted with a link to the bounty, a tag of

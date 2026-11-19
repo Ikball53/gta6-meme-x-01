@@ -1,31 +1,56 @@
-// Entry program for the gta6-meme-x-01 bounty.
+// Wake Me Up When GTA 6 Drops — entry program for gta6-meme-x-01.
 //
-// The judged artifact is the X post itself, which the house reads on
-// its own. This program has exactly one job: take POST.json from the
-// repository root and copy it into the output directory so the gate
-// can read the post address from there.
+// The meme itself lives in the X post named by POST.json; the house reads
+// that post directly. This program's only job is to surface the post's
+// address to the gate: it reads POST.json, checks the link looks like an
+// X status URL, writes it into the output directory, and exits.
 
-import { copyFileSync, mkdirSync, readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-const repoRoot: string = process.env.MAKEFUN_BOT_DIR ?? ".";
-const outputDir: string = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+const POST_FILE = "POST.json";
+const CAPTION_FILE = "caption.txt";
+const OUTPUT_NAME = "post-url.txt";
+const CAPTION_OUTPUT_NAME = "caption.txt";
 
-const sourcePath: string = join(repoRoot, "POST.json");
-const targetPath: string = join(outputDir, "POST.json");
-
-// Fail loudly here rather than hand the gate a file it cannot read:
-// POST.json must be a JSON object carrying the post address as a string.
-const parsed: unknown = JSON.parse(readFileSync(sourcePath, "utf8"));
-if (
-  typeof parsed !== "object" ||
-  parsed === null ||
-  typeof (parsed as { url?: unknown }).url !== "string"
-) {
-  throw new Error("POST.json must be a JSON object with a string \"url\"");
+function loadPostAddress(): string {
+  const raw = readFileSync(POST_FILE, "utf8");
+  const parsed = JSON.parse(raw) as { url?: unknown };
+  if (typeof parsed.url !== "string" || parsed.url.length === 0) {
+    throw new Error("POST.json carries no url string");
+  }
+  return parsed.url;
 }
 
-mkdirSync(outputDir, { recursive: true });
-copyFileSync(sourcePath, targetPath);
+function looksLikeStatusLink(address: string): boolean {
+  return /^https:\/\/x\.com\/[^/]+\/status\/\d+$/.test(address);
+}
 
-console.log(`POST.json copied to ${targetPath}`);
+function loadCaption(): string {
+  return readFileSync(CAPTION_FILE, "utf8");
+}
+
+function findPlayCode(caption: string): string | null {
+  const match = caption.match(/makefun-[a-z]+-[a-z]+-[a-z]+/);
+  return match ? match[0] : null;
+}
+
+function main(): void {
+  const address = loadPostAddress();
+  if (!looksLikeStatusLink(address)) {
+    throw new Error(`unexpected post address: ${address}`);
+  }
+  const caption = loadCaption();
+  const playCode = findPlayCode(caption);
+  if (playCode === null) {
+    throw new Error("caption.txt carries no play code");
+  }
+  const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+  mkdirSync(outDir, { recursive: true });
+  writeFileSync(join(outDir, OUTPUT_NAME), address + "\n", "utf8");
+  writeFileSync(join(outDir, CAPTION_OUTPUT_NAME), caption, "utf8");
+  console.log(`post: ${address}`);
+  console.log(`play code: ${playCode}`);
+}
+
+main();
